@@ -8,5 +8,24 @@
  * 3. Support log levels: `trace`, `debug`, `info`, `warn`, `error`, `fatal`.
  * 4. Never use raw `console.log` in production code.
  */
+import pino from "pino";
+import { env } from "../config/env.js";
 
-export {};
+const logger = pino({
+  level: env.LOG_LEVEL || (env.NODE_ENV === "production" ? "info" : "debug"),
+  // Pretty-print only in development
+  transport:
+    env.NODE_ENV !== "production"
+      ? {
+          target: "pino-pretty",
+          options: {
+            colorize: true,
+            translateTime: "SYS:yyyy-mm-dd HH:MM:ss",
+            ignore: "pid,hostname",
+          },
+        }
+      : undefined,
+  // Standard redact list to prevent accidental credential leakage
+  redact: ["req.headers.authorization", "password", "token", "creditCard"],
+});
+export { logger };

@@ -8,5 +8,23 @@
  * 3. Never log sensitive information such as passwords, auth tokens, or payment card numbers (sanitize/redact fields).
  * 4. Leverage production-ready logging libraries like `pino-http` or `morgan`.
  */
+import { pinoHttp } from "pino-http";
+import crypto from "node:crypto";
+import { logger } from "../utils/logger.js";
 
-export {};
+const httpLogger = pinoHttp({
+  logger,
+  // Use existing header or generate a new UUID for tracing
+  genReqId: (req) =>
+    (req.headers["x-request-id"] as string) || crypto.randomUUID(),
+  customLogLevel: (_req, res, err) => {
+    if (res.statusCode >= 500 || err) return "error";
+    if (res.statusCode >= 400) return "warn";
+    return "info";
+  },
+  customSuccessMessage: (req, res) =>
+    `${req.method} ${req.url} completed with ${res.statusCode}`,
+  customErrorMessage: (req, res, err) =>
+    `${req.method} ${req.url} failed with ${res.statusCode}: ${err.message}`,
+});
+export { httpLogger };

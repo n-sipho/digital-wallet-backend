@@ -13,4 +13,29 @@
  * 8. Export the app instance without calling `.listen()`.
  */
 
-export {};
+import express, { Application, Request, Response, NextFunction } from "express";
+import cors from "cors";
+// import helmet from "helmet";
+import { router } from "./routes/index";
+import { errorMiddleware } from "./middlewares/error.middleware";
+import { AppError } from "./utils/appError";
+import { httpLogger } from "./middlewares/logger.middleware";
+
+const app: Application = express();
+ app.use(httpLogger);
+// Middlewares
+// app.use(helmet());
+app.use(cors());
+app.use(express.json());
+
+// Routes
+app.use("/", router);
+
+// Catch 404 (Route Not Found) and pass to error handler
+app.use((req: Request, _res: Response, next: NextFunction) => {
+  next(new AppError(`Route ${req.method} ${req.originalUrl} not found`, 404));
+});
+
+app.use(errorMiddleware);
+
+export { app };
