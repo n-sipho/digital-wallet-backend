@@ -1,12 +1,10 @@
-/**
- * @file app.test.ts (integration test)
- * @description API endpoint integration / end-to-end tests.
- *
- * Best Practices:
- * 1. Test full HTTP request/response cycles using tools like `supertest`.
- * 2. Import the `app` instance directly from `src/app.ts` without starting the network listener in `src/server.ts`.
- * 3. Verify status codes, header structures, and response JSON schemas.
- * 4. Run tests against a disposable test database (e.g. test container or SQLite/Postgres in-memory/test instance).
- */
+import request from "supertest";
+import { app } from "../../src/app";
 
-export {};
+describe("Health API", () => {
+  it("GET /health returns 200 OK", async () => {
+    const res = await request(app).get("/health");
+    expect(res.status).toBe(200);
+    expect(res.body.status).toBe("ok");
+  });
+});

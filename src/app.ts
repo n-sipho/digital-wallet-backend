@@ -21,7 +21,7 @@ import { errorMiddleware } from "./middlewares/error.middleware";
 import { AppError } from "./utils/appError";
 import { httpLogger } from "./middlewares/logger.middleware";
 
-const app: Application = express();
+export const app: Application = express();
  app.use(httpLogger);
 // Middlewares
 // app.use(helmet());
@@ -38,4 +38,4 @@ app.use((req: Request, _res: Response, next: NextFunction) => {
 
 app.use(errorMiddleware);
 
-export { app };
+// export { app };

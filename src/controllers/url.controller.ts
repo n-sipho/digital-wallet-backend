@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import { urlService } from '../services/url.service';
 import { shortenUrlQuerySchema } from '../validators/url.validator';
 import { AppError } from '../utils/appError';
+import { sendSuccess } from '../utils/apiResponse';
 
 /**
  * GET /api/v1/urls/shorten?url=https://...
@@ -31,12 +32,9 @@ export async function shortenUrlController(
     const protocol = req.protocol;
     const shortUrl = `${protocol}://${host}/api/v1/urls/${result.shortCode}`;
 
-    res.status(200).json({
-      success: true,
-      data: {
-        ...result,
-        shortUrl,
-      },
+    sendSuccess(res, {
+      ...result,
+      shortUrl,
     });
   } catch (error) {
     // Pass errors down to centralized error middleware

@@ -2,7 +2,7 @@ import { Router } from 'express';
 import {
   shortenUrlController,
   resolveUrlController,
-} from '../../../controllers/url.controller';
+} from '@/controllers/url.controller';
 
 const router = Router();
 

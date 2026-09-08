@@ -11,6 +11,7 @@
 
 import { Request, Response, NextFunction } from "express";
 import { AppError } from "../utils/appError";
+import { sendError } from "../utils/apiResponse";
 // import { logger } from '../utils/logger.js';
 
 function errorMiddleware(
@@ -20,13 +21,11 @@ function errorMiddleware(
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   next: NextFunction,
 ): void {
-  const isProduction = process.env.NODE_ENV === "production";
-
   // Identify operational errors vs unexpected bugs
   const isAppError = err instanceof AppError;
   const statusCode = isAppError ? err.statusCode : 500;
   const message =
-    isAppError || !isProduction ? err.message : "Internal Server Error";
+    isAppError ? err.message : "Internal Server Error";
   const details = isAppError ? err.details : undefined;
 
   // Structured logging
@@ -39,15 +38,7 @@ function errorMiddleware(
     );
   }
 
-  // Send uniform JSON error response
-  res.status(statusCode).json({
-    success: false,
-    error: {
-      message,
-      statusCode,
-      ...(details ? { details } : {}),
-      ...(!isProduction ? { stack: err.stack } : {}),
-    },
-  });
+  // Send uniform JSON error response via apiResponse helper
+  sendError(res, message, statusCode, details);
 }
 export { errorMiddleware };

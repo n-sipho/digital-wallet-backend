@@ -15,13 +15,13 @@ const logger = pino({
   level: env.LOG_LEVEL || (env.NODE_ENV === "production" ? "info" : "debug"),
   // Pretty-print only in development
   transport:
-    env.NODE_ENV !== "production"
+    env.NODE_ENV !== "production"||"test"
       ? {
           target: "pino-pretty",
           options: {
             colorize: true,
             translateTime: "SYS:yyyy-mm-dd HH:MM:ss",
-            ignore: "pid,hostname",
+            ignore: "pid,hostname,req,res",
           },
         }
       : undefined,
