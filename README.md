@@ -1,4 +1,6 @@
-# Backend Service
+# Digital Wallet Backend
+
+[![Backend CI](https://github.com/n-sipho/digital-wallet-backend/actions/workflows/backend.yml/badge.svg)](https://github.com/n-sipho/digital-wallet-backend/actions/workflows/backend.yml)
 
 <!--
 ==============================================================================
