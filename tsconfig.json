@@ -1,0 +1,28 @@
+{
+  // ==============================================================================
+  // TypeScript Configuration (tsconfig.json)
+  //
+  // Best Practice:
+  // - Enable strict type checking (`strict: true`) to catch errors at compile time.
+  // - Set target to ES2022 / modern Node.js capabilities.
+  // - Configure path aliases if needed (e.g. `@/*`: ["src/*"]).
+  // ==============================================================================
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "lib": ["ES2022"],
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "baseUrl": "./",
+    "paths": {
+      "@/*": ["src/*"]
+    }
+  },
+  "include": ["src/**/*", "tests/**/*"],
+  "exclude": ["node_modules", "dist"]
+}

@@ -1,0 +1,15 @@
+{
+  "_comment": "Backend package configuration. Define scripts, dependencies, and project metadata here.",
+  "name": "backend",
+  "version": "1.0.0",
+  "description": "Backend API service",
+  "main": "dist/server.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/server.js",
+    "dev": "tsx watch src/server.ts",
+    "test": "jest"
+  },
+  "dependencies": {},
+  "devDependencies": {}
+}
