@@ -35,9 +35,6 @@ importers:
       pino-http:
         specifier: ^11.0.0
         version: 11.0.0
-      tsx:
-        specifier: ^4.23.13
-        version: 4.23.13
       zod:
         specifier: ^4.5.4
         version: 4.5.4
@@ -81,6 +78,9 @@ importers:
       ts-jest:
         specifier: ^29.4.12
         version: 29.4.12(@babel/core@7.29.7)(@jest/transform@30.5.1)(@jest/types@30.5.1)(babel-jest@30.5.1(@babel/core@7.29.7))(jest-util@30.5.1)(jest@30.5.1(@types/node@26.5.0))(typescript@7.0.2)
+      tsx:
+        specifier: ^4.23.13
+        version: 4.23.13
       typescript:
         specifier: ^7.0.2
         version: 7.0.2

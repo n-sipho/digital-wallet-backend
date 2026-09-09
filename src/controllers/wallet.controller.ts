@@ -21,7 +21,6 @@ async function getWalletAddressController(
     }
     logger.info(`Wallet Address URL: ${walletAddressUrl}`);
     // TODO: Implement wallet retrieval logic (e.g., via walletService)
-    // const wallet = await walletService.getById(id);
     const wallet = await walletService.getWalletAddress(walletAddressUrl);
 
     sendSuccess(res, { wallet });

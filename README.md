@@ -20,7 +20,7 @@ This backend follows a layered modular architecture:
 - **Middlewares**: Process cross-cutting concerns (auth, logging, rate limiting, error handling).
 
 ## Getting Started
-1. Install dependencies: `npm install` (or `pnpm install`)
+1. Install dependencies: `pnpm install`
 2. Copy environment file: `cp .env.example .env`
-3. Run in development mode: `npm run dev`
-4. Run tests: `npm test`
+3. Run in development mode: `pnpm dev`
+4. Run tests: `pnpm test`

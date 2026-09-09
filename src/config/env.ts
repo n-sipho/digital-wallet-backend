@@ -25,6 +25,7 @@ const envSchema = z.object({
   // JWT_SECRET: z
   //   .string()
   //   .min(16, "JWT_SECRET must be at least 16 characters long"),
+  
   JWT_EXPIRES_IN: z.string().default("1d"),
   CORS_ORIGIN: z.string().default("http://localhost:3000"),
   LOG_LEVEL: z.enum(["debug", "info", "warn", "error"]).default("info"),
