@@ -38,3 +38,6 @@ coverage/
 Thumbs.db
 .vscode/
 .idea/
+
+run.sh
+utils.sh
