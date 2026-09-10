@@ -3,11 +3,11 @@ import { app } from "../../src/app";
 import nock from "nock";
 import { walletService } from "@/services/wallet.service";
 
-describe("POST /api/v1/accounts/wallet", () => {
+describe("POST /api/v1/wallet/verify", () => {
   it("should return 400 when walletAddressUrl is missing", async () => {
     const warnSpy = jest.spyOn(console, "warn").mockImplementation(() => {});
     const res = await request(app)
-      .post("/api/v1/accounts/wallet")
+      .post("/api/v1/wallet/verify")
       .send({ walletAddressUrl: "" });
 
     expect(res.statusCode).toBe(400);
@@ -33,7 +33,7 @@ describe("POST /api/v1/accounts/wallet", () => {
       .spyOn(walletService, "getWalletAddress")
       .mockResolvedValueOnce(mockWallet);
 
-    const res = await request(app).post("/api/v1/accounts/wallet").send({
+    const res = await request(app).post("/api/v1/wallet/verify").send({
       walletAddressUrl: "https://wallet.example.com/accounts/broke",
     });
 
