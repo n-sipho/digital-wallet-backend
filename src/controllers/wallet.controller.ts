@@ -3,6 +3,7 @@ import { AppError } from "../utils/appError";
 import { sendSuccess } from "../utils/apiResponse";
 import { walletService } from "@/services/wallet.service";
 import { logger } from "@/utils/logger";
+import { grantRepository } from "@/repositories/grant.repository";
 
 /**
  * GET /api/v1/acounts/wallets/
@@ -48,7 +49,30 @@ async function verifyWallet(
     // TODO: Implement wallet retrieval logic (e.g., via walletService)
     const wallet = await walletService.getWalletAddress(walletAddressUrl);
 
-    sendSuccess(res, { wallet });
+    sendSuccess(res, wallet);
+  } catch (error) {
+    next(error);
+  }
+}
+
+/**
+ * Controller to request grant for user account auth.
+ */
+async function requestGrantController(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): Promise<void> {
+  try {
+    const { walletAddressUrl } = req.body;
+
+    if (!walletAddressUrl) {
+      throw new AppError("Wallet Address is required", 400);
+    }
+    logger.info(`Request grant for Wallet Address URL: ${walletAddressUrl}`);
+
+    const grantResults = await walletService.requestGrant(walletAddressUrl);
+    sendSuccess(res, grantResults);
   } catch (error) {
     next(error);
   }
@@ -170,6 +194,35 @@ async function transferFundsController(
   }
 }
 
+/**
+ * GET /api/v1/acounts/wallets/
+ * Controller to resolves an Open Payments wallet address.
+ */
+async function finalizeGrantController(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): Promise<void> {
+  try {
+    const hash = req.query.hash as string;
+    const interactRef = req.query.interact_ref as string;
+    const transactionId = req.query.transaction_id as string;
+
+    if (!hash || !interactRef || !transactionId) {
+      throw new AppError(`Missing hash and interact_ref in query`, 400);
+    }
+
+    const pendingGrant = await walletService.finilizeGrant(
+      transactionId,
+      interactRef,
+    );
+
+    sendSuccess(res, pendingGrant);
+  } catch (error) {
+    next(error);
+  }
+}
+
 export default {
   verifyWalletAddress: verifyWallet,
   getWallet: getWalletAddressController,
@@ -177,4 +230,6 @@ export default {
   createWallet: createWalletController,
   getTransactions: getWalletTransactionsController,
   transferFunds: transferFundsController,
+  requestGrantController,
+  finalizeGrantController,
 };

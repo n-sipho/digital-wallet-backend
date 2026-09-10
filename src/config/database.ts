@@ -8,5 +8,12 @@
  * 3. Export connection and disconnection helper functions (e.g. `connectDB()` and `disconnectDB()`).
  * 4. Implement retry strategies and exponential backoff for transient connection errors during startup.
  */
-
-export {};
+import { Grant, PendingGrant } from "@interledger/open-payments";
+// interface PendingGrant {
+//   accessToken: string;
+//   url: string;
+// }
+export const memoryDb = {
+  pendingGrants: new Map<string, PendingGrant>(),
+  finalTokens: new Map<string, string>(),
+};

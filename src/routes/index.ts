@@ -2,7 +2,13 @@ import { Router, Request, Response } from "express";
 import { v1Router } from "./api/v1/index";
 // import { checkDatabaseHealth } from '../config/database.js';
 
-const router = Router();
+export const router = Router();
+
+/**
+ * API Version 1 Routes
+ * Mounts all /api/v1 endpoints (e.g. /api/v1/urls/shorten)
+ */
+router.use("/api/v1", v1Router);
 
 /**
  * GET /health (or /health/live)
@@ -44,10 +50,3 @@ router.get("/health/ready", async (_req: Request, res: Response) => {
   }
 });
 
-/**
- * API Version 1 Routes
- * Mounts all /api/v1 endpoints (e.g. /api/v1/urls/shorten)
- */
-router.use("/api/v1", v1Router);
-
-export { router };
