@@ -20,6 +20,7 @@ build/
 .env.*.local
 *.pem
 *.key
+.env.tunnel
 
 # Logs
 logs/

@@ -3,6 +3,6 @@ import walletController from "@/controllers/wallet.controller";
 const router = Router();
 
 // Route: GET /api/v1/urls/shorten?url=https://...
-router.post("/wallet", walletController.getWallet);
+router.post("/verify", walletController.verifyWalletAddress);
 
 export { router as walletRouter };

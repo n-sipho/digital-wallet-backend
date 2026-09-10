@@ -30,6 +30,31 @@ async function getWalletAddressController(
 }
 
 /**
+ * GET /api/v1/acounts/wallets/
+ * Controller to resolves an Open Payments wallet address.
+ */
+async function verifyWallet(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): Promise<void> {
+  try {
+    const { walletAddressUrl } = req.body;
+
+    if (!walletAddressUrl) {
+      throw new AppError("Wallet Address is required", 400);
+    }
+    logger.info(`Wallet Address URL: ${walletAddressUrl}`);
+    // TODO: Implement wallet retrieval logic (e.g., via walletService)
+    const wallet = await walletService.getWalletAddress(walletAddressUrl);
+
+    sendSuccess(res, { wallet });
+  } catch (error) {
+    next(error);
+  }
+}
+
+/**
  * GET /api/v1/wallets/:id/balance
  * Controller to retrieve balance information for a specific wallet.
  */
@@ -146,6 +171,7 @@ async function transferFundsController(
 }
 
 export default {
+  verifyWalletAddress: verifyWallet,
   getWallet: getWalletAddressController,
   getBalance: getWalletBalanceController,
   createWallet: createWalletController,

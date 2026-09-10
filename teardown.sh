@@ -6,7 +6,7 @@ set -e
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # Resolve rafiki directory whether run from rewards-platform root or rafiki-instance00
-if [ -d "$SCRIPT_DIR/rafiki-instance00" ]; then
+if [ -d "$SCRIPT_DIR/../rafiki-instance00" ]; then
   RAFIKI_DIR="$SCRIPT_DIR/rafiki-instance00"
 elif [ -f "$SCRIPT_DIR/package.json" ] && grep -q "@interledger/rafiki" "$SCRIPT_DIR/package.json" 2>/dev/null; then
   RAFIKI_DIR="$SCRIPT_DIR"

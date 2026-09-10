@@ -1,6 +1,6 @@
 import { createUnauthenticatedClient } from "@interledger/open-payments";
 
-export interface WalletAddressResult {
+export interface Wallet {
   id: string;
   publicName?: string;
   assetCode: string;
@@ -8,15 +8,14 @@ export interface WalletAddressResult {
   authServer: string;
   resourceServer: string;
   cardService?: string;
+  pointOfSaleService?: string;
 }
 
 export class WalletService {
   /**
    * Retrieves the original URL for a given short code.
    */
-  public async getWalletAddress(
-    walletAddressUrl: string,
-  ): Promise<WalletAddressResult> {
+  public async getWalletAddress(walletAddressUrl: string): Promise<Wallet> {
     const client = await createUnauthenticatedClient({});
 
     const walletAddress = await client.walletAddress.get({
