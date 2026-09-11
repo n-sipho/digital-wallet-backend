@@ -1,6 +1,7 @@
-import { Router  } from "express";
+import { Router } from "express";
 import { urlRouter } from "./url.routes";
 import { walletRouter } from "./wallet.routes";
+import { onboardingRouter } from "./onboarding.routes";
 
 const router = Router();
 
@@ -9,6 +10,7 @@ const router = Router();
 router.use("/urls", urlRouter);
 router.use("/wallet", walletRouter);
 
-
+// Onboarding routes
+router.use("/onboarding", onboardingRouter);
 
 export { router as v1Router };

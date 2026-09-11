@@ -15,7 +15,7 @@ const logger = pino({
   level: env.LOG_LEVEL || (env.NODE_ENV === "production" ? "info" : "debug"),
   // Pretty-print only in development
   transport:
-    env.NODE_ENV !== "production"||"test"
+    env.NODE_ENV !== "production"
       ? {
           target: "pino-pretty",
           options: {

@@ -19,15 +19,17 @@ const envSchema = z.object({
     .enum(["development", "test", "production"])
     .default("development"),
   PORT: z.coerce.number().default(5000),
+  FRONTEND_URL: z.url(),
+  HOST: z.url().default("http://localhost:9000"),
   // DATABASE_URL: z
   //   .string()
   //   .url("DATABASE_URL must be a valid connection string"),
   // JWT_SECRET: z
   //   .string()
   //   .min(16, "JWT_SECRET must be at least 16 characters long"),
-  
+
   JWT_EXPIRES_IN: z.string().default("1d"),
-  CORS_ORIGIN: z.string().default("http://localhost:3000"),
+  CORS_ORIGIN: z.string(),
   LOG_LEVEL: z.enum(["debug", "info", "warn", "error"]).default("info"),
 });
 
