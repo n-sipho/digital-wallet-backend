@@ -31,7 +31,6 @@ class OnboardingService {
       // Return existing session instead of creating a new one
       return this.toResponse(existing);
     }
-
     // Create the session in PENDING state
     const session: OnboardingSession = {
       id: `onb_${uuidv4()}`,
@@ -107,6 +106,14 @@ class OnboardingService {
                 type: "outgoing-payment",
                 actions: ["create", "read", "list"],
                 identifier: session.walletAddressUrl,
+              },
+            ],
+          },
+          subject: {
+            sub_ids: [
+              {
+                id: session.id,
+                format: "uri",
               },
             ],
           },
@@ -231,6 +238,8 @@ class OnboardingService {
     data?: Partial<OnboardingSession>,
   ): Promise<OnboardingSession> {
     const session = await onboardingRepository.findById(sessionId);
+    console.log("New status:", newStatus);
+    console.log("Session:", session);
     if (!session) throw new AppError("Session not found", 404);
 
     const allowed = VALID_TRANSITIONS[session.status];
