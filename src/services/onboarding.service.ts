@@ -81,16 +81,24 @@ class OnboardingService {
       throw new AppError(
         `Cannot request consent: session is in '${session.status}' state. Expected 'WALLET_RESOLVED'.`,
         409,
+        { state: session.status },
       );
     }
 
     const client = await getOpenPaymentsClient();
 
+    const userWalletAddress = await client.walletAddress.get({
+      url: session.walletAddressUrl,
+    });
+
     // Build the redirect URL with session ID for the callback
     const callbackUrl = `${process.env.HOST}/api/v1/onboarding/callback?session_id=${sessionId}`;
+    console.log("auth server:", session.wallet!.authServer);
     try {
       const grant = (await client.grant.request(
-        { url: session.wallet!.authServer },
+        {
+          url: userWalletAddress.authServer,
+        },
         {
           access_token: {
             access: [
@@ -112,7 +120,7 @@ class OnboardingService {
           subject: {
             sub_ids: [
               {
-                id: session.id,
+                id: userWalletAddress.id,
                 format: "uri",
               },
             ],
@@ -121,8 +129,8 @@ class OnboardingService {
             start: ["redirect"],
             finish: {
               method: "redirect",
-              uri: callbackUrl,
-              nonce: uuidv4(), // unique nonce per grant request
+              uri: callbackUrl, // where to redirect the user to after they've completed the interaction
+              nonce: "123",
             },
           },
         },

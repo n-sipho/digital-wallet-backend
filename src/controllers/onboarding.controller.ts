@@ -112,7 +112,7 @@ class OnboardingController {
     next: NextFunction,
   ): Promise<void> => {
     try {
-      const sessionId = req.params.sessionId as string;
+      const sessionId = req.query.session_id as string;
       if (!sessionId) throw new AppError("sessionId is required", 400);
 
       const result = await onboardingService.getStatus(sessionId);

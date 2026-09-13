@@ -2,6 +2,7 @@ import { Router } from "express";
 import { urlRouter } from "./url.routes";
 import { walletRouter } from "./wallet.routes";
 import { onboardingRouter } from "./onboarding.routes";
+import { redisRouter } from "./redis.routes";
 
 const router = Router();
 
@@ -12,5 +13,8 @@ router.use("/wallet", walletRouter);
 
 // Onboarding routes
 router.use("/onboarding", onboardingRouter);
+
+// Redis routes
+router.use("/redis", redisRouter);
 
 export { router as v1Router };

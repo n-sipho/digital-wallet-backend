@@ -15,7 +15,7 @@ router.get("/callback", onboardingController.handleCallback);
 // Status: Poll session state from the frontend
 router.get("/:sessionId/status", onboardingController.getStatus);
 
-router.get("/onboarding/success", onboardingController.getStatus);
+router.get("/success", onboardingController.getStatus);
 
 
 export { router as onboardingRouter };
