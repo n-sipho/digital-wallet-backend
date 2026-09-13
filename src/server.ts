@@ -12,16 +12,14 @@ import http from "node:http";
 import { app } from "./app";
 import { env } from "./config/env";
 import { logger } from "./utils/logger";
+import { connectRedis, disconnectRedis } from "./config/redis";
 
 const server = http.createServer(app);
 
 async function startServer(): Promise<void> {
   try {
-    // Initialize database & external services first
-    // await connectDB();
-    // logger.info('Database connected successfully');
+    await connectRedis();
 
-    // Start listening on the configured port
     server.listen(env.PORT, () => {
       logger.info(`Server running in ${env.NODE_ENV} mode on port ${env.PORT}`);
     });
@@ -38,6 +36,8 @@ function setupGracefulShutdown(): void {
   for (const signal of signals) {
     process.on(signal, async () => {
       logger.info(`Received ${signal}, initiating graceful shutdown...`);
+
+      await disconnectRedis();
 
       server.close(async (err) => {
         if (err) {

@@ -1,0 +1,45 @@
+# Base infrastructure services shared across dev and prod
+name: rewards-platform
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    networks:
+      - rewards
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./dbinit.sql:/docker-entrypoint-initdb.d/init.sql   # ← Auto-runs on first boot
+    ports:
+      - "${DB_PORT:-5432}:5432"
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    networks:
+      - rewards
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+  networks:
+    rewards:
+      driver: bridge
+
+volumes:
+  pgdata:
+    redis-data:

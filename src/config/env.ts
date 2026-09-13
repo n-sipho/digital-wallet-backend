@@ -21,6 +21,7 @@ const envSchema = z.object({
   PORT: z.coerce.number().default(5000),
   FRONTEND_URL: z.url(),
   HOST: z.url().default("http://localhost:9000"),
+  REDIS_URL: z.string().default("redis://localhost:6379"),
   // DATABASE_URL: z
   //   .string()
   //   .url("DATABASE_URL must be a valid connection string"),

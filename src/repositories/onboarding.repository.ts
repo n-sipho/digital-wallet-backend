@@ -1,4 +1,6 @@
+import { redisClient } from "@/config/redis";
 import { OnboardingSession } from "@/types/onboarding";
+import { AppError } from "@/utils/appError";
 import { logger } from "@/utils/logger";
 
 /**
@@ -12,76 +14,138 @@ import { logger } from "@/utils/logger";
  *   - A Knex/Drizzle/Prisma query file
  *   - The interface stays the same (no service changes needed)
  */
+const SESSION_PREFIX = process.env.SESSION_PREFIX;
+const USER_ACTIVE_PREFIX = process.env.USER_ACTIVE_PREFIX;
+const SESSION_TTL_SECONDS = Number(process.env.SESSION_TTL_MS) * 60; // example 15 minutes
+
 const sessionStore = new Map<string, OnboardingSession>();
 
-/** Index by userId for "get my sessions" lookups */
-const userSessionIndex = new Map<string, Set<string>>();
-
 export class OnboardingRepository {
-  async save(session: OnboardingSession): Promise<void> {
-    sessionStore.set(session.id, { ...session });
+  private sessionKey(id: string): string {
+    return `${SESSION_PREFIX}${id}`;
+  }
 
-    // Maintain user → sessions index
-    if (!userSessionIndex.has(session.userId)) {
-      userSessionIndex.set(session.userId, new Set());
-    }
-    userSessionIndex.get(session.userId)!.add(session.id);
+  private userActiveKey(userId: string): string {
+    return `${USER_ACTIVE_PREFIX}${userId}:active`;
+  }
+  /**
+   * Saves a new session and sets the TTL.
+   */
+  async save(session: OnboardingSession): Promise<void> {
+    const key = this.sessionKey(session.id);
+    const userKey = this.userActiveKey(session.userId);
+
+    const serialized = JSON.stringify(session);
+
+    await redisClient
+      .multi()
+      .set(userKey, session.id, "EX", SESSION_TTL_SECONDS)
+      .set(key, serialized, "EX", SESSION_TTL_SECONDS)
+      .exec();
 
     logger.info(
       { sessionId: session.id, status: session.status },
-      "[Onboarding] Session saved",
+      "[Redis] Onboarding session saved",
     );
   }
   async findById(sessionId: string): Promise<OnboardingSession | null> {
-    return sessionStore.get(sessionId) ?? null;
+    const key = this.sessionKey(sessionId);
+    const serialized = await redisClient.get(key);
+    if (serialized != null) {
+      const deserialized = this.deserialize(serialized);
+      return deserialized;
+    }
+
+    return null;
   }
 
-  async findByUserId(userId: string): Promise<OnboardingSession[]> {
-    const sessionIds = userSessionIndex.get(userId);
-    if (!sessionIds) return [];
+  // async findByUserId(userId: string): Promise<OnboardingSession[]> {
+  //   const userKey = this.userActiveKey(userId);
+  //   const sessionIds = await redisClient.get(userKey);
+  //   console.log("session ids:", sessionIds);
+  //   if (!sessionIds) return [];
 
-    return Array.from(sessionIds)
-      .map((id) => sessionStore.get(id))
-      .filter(Boolean) as OnboardingSession[];
-  }
+  //   return Array.from("")
+  //     .map((id) => redisClient.get(``))
+  //     .filter(Boolean) as OnboardingSession[];
+  // }
+
   async findActiveByUserId(userId: string): Promise<OnboardingSession | null> {
-    const sessions = await this.findByUserId(userId);
-    // Return the most recent non-terminal session
-    return (
-      sessions
-        .filter((s) => !["COMPLETED", "FAILED", "EXPIRED"].includes(s.status))
-        .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())[0] ??
-      null
-    );
+    const userKey = this.userActiveKey(userId);
+    const sessionId = await redisClient.get(userKey);
+
+    if (sessionId != null) {
+      const key = this.sessionKey(sessionId);
+      const session = await redisClient.get(key);
+      if (session != null) {
+        const deserialized = this.deserialize(session);
+        return deserialized;
+      }
+    }
+
+    return null;
   }
 
   async update(
     sessionId: string,
     updates: Partial<OnboardingSession>,
   ): Promise<OnboardingSession> {
-    const existing = sessionStore.get(sessionId);
-    if (!existing) throw new Error(`Session ${sessionId} not found`);
+    const key = this.sessionKey(sessionId);
+    const existing = await redisClient.get(key);
+
+    if (!existing) throw new AppError(`Session ${sessionId} not found`);
+
+    const deserialized = this.deserialize(existing);
 
     const updated: OnboardingSession = {
-      ...existing,
+      ...deserialized,
       ...updates,
       updatedAt: new Date(),
     };
-    sessionStore.set(sessionId, updated);
 
-    logger.info(
-      { sessionId, status: updated.status },
-      "[Onboarding] Session updated",
+    const serialized = JSON.stringify(updated);
+
+    await redisClient.set(key, serialized, "KEEPTTL").then(
+      (onfulfilled) => {
+        logger.info(
+          { sessionId, status: updated.status },
+          "[Onboarding] Session updated",
+        );
+      },
+      (onrejected) => {
+        logger.warn(
+          { sessionId, status: updated.status },
+          "[Onboarding] Session update rejected",
+        );
+        throw new AppError(`Session update rejected`);
+      },
     );
+
     return updated;
   }
 
   async delete(sessionId: string): Promise<void> {
-    const session = sessionStore.get(sessionId);
-    if (session) {
-      userSessionIndex.get(session.userId)?.delete(sessionId);
-      sessionStore.delete(sessionId);
-    }
+    const session = await this.findById(sessionId);
+    if (!session) return;
+
+    await redisClient
+      .multi()
+      .del(this.sessionKey(sessionId))
+      .del(this.userActiveKey(session.userId))
+      .exec();
+  }
+
+  /**
+   * Helper to parse dates correctly from JSON string.
+   */
+  private deserialize(raw: string): OnboardingSession {
+    let data = JSON.parse(raw);
+    return {
+      ...data,
+      createdAt: new Date(data.createdAt),
+      updatedAt: new Date(data.updatedAt),
+      completedAt: data.completedAt ? new Date(data.completedAt) : undefined,
+    };
   }
 }
 
