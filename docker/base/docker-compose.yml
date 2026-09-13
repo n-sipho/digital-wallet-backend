@@ -1,31 +1,34 @@
 # Base infrastructure services shared across dev and prod
-name: rewards-platform
+name: wallet-backend
 services:
-  postgres:
-    image: postgres:16-alpine
+  shared-database:
+    image: postgres:16-alpine # use latest official postgres version
+    container_name: digital-wallet-postgres
     restart: unless-stopped
     networks:
-      - rewards
+      - wallet-backend
     volumes:
-      - pgdata:/var/lib/postgresql/data
-      - ./dbinit.sql:/docker-entrypoint-initdb.d/init.sql   # ← Auto-runs on first boot
+      - pgdata:/var/lib/postgresql/data # persist data even if container shuts down
+      - ./dbinit.sql:/docker-entrypoint-initdb.d/01-dbinit.sql
+      - ./seed.sql:/docker-entrypoint-initdb.d/02-seed.sql # ← Auto-runs on first boot
     ports:
       - "${DB_PORT:-5432}:5432"
     environment:
-      POSTGRES_USER: ${POSTGRES_USER:-postgres}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: ${POSTGRES_DB:-wallet_backend}
+      POSTGRES_USER: ${POSTGRES_USER:-wallet_backend}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-wallet_backend}
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -d postgres"]
+      test: ["CMD-SHELL", "pg_isready -U wallet_backend -d wallet_backend"]
       interval: 10s
       timeout: 5s
       retries: 5
       start_period: 30s
-
-  redis:
-    image: redis:7-alpine
+  shared-redis:
+    image: "redis:8"
+    container_name: digital-wallet-redis
     restart: unless-stopped
-    networks:
-      - rewards
+    # Enables data persistence (saves DB every 60s if >=1 key changed) and sets a password
+    command: redis-server --save 60 1 --loglevel notice --requirepass ${REDIS_PASSWORD:-secretpassword}
     ports:
       - "${REDIS_PORT:-6379}:6379"
     volumes:
@@ -35,11 +38,11 @@ services:
       interval: 10s
       timeout: 3s
       retries: 5
-
-  networks:
-    rewards:
-      driver: bridge
-
+    networks:
+      - wallet-backend
+networks:
+  wallet-backend:
+    driver: bridge
 volumes:
+  redis-data:
   pgdata:
-    redis-data:
