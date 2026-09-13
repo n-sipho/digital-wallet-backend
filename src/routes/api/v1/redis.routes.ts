@@ -5,7 +5,7 @@ const router = Router();
 
 router.get("/health", async (_req: Request, res: Response) => {
   try {
-    const redisPong = await redis.ping();
+    const redisPong = await redisClient.ping();
     const isRedisReady = redisPong === "PONG";
 
     res.status(isRedisReady ? 200 : 503).json({
@@ -22,4 +22,4 @@ router.get("/health", async (_req: Request, res: Response) => {
   }
 });
 
-export { router as urlRouter };
+export { router as redisRouter };
