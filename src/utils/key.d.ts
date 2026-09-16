@@ -48,3 +48,4 @@ export declare function loadBase64Key(
   base64Key: string,
 ): crypto.KeyObject | undefined;
 export {};
+

@@ -11,7 +11,10 @@
     "start": "node dist/server.js",
     "dev": "tsx watch src/server.ts",
     "test": "jest",
-    "tunnel:start": "tsx local-tunnel-setup.ts"
+    "tunnel:start": "tsx local-tunnel-setup.ts",
+    "localenv:compose": "docker compose -f docker/base/docker-compose.yml --env-file ./.env",
+    "localenv:clean": "pnpm localenv:compose down --volumes --rmi all",
+    "api:logs": "pnpm localenv:compose logs -f wallet-api"
   },
   "dependencies": {
     "@interledger/open-payments": "^7.4.0",

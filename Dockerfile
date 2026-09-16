@@ -7,21 +7,26 @@
 # - Run as a non-root user (e.g. `node`) for enhanced container security.
 # ==============================================================================
 
-# STAGE 1: Build stage
-# FROM node:20-alpine AS builder
-# WORKDIR /app
-# COPY package*.json tsconfig.json ./
-# RUN npm ci
-# COPY src/ ./src
-# RUN npm run build
+FROM node:24-alpine3.23
 
-# STAGE 2: Production runner
-# FROM node:20-alpine AS runner
-# WORKDIR /app
-# ENV NODE_ENV=production
-# COPY package*.json ./
-# RUN npm ci --only=production
-# COPY --from=builder /app/dist ./dist
-# USER node
-# EXPOSE 5000
-# CMD ["node", "dist/server.js"]
+# Set up the working directory and switch to the built-in node user
+WORKDIR /home/backend
+
+# Enable pnpm
+RUN corepack enable && corepack prepare pnpm@10.33.0 --activate
+
+RUN chown -R node:node /home/backend
+USER node
+
+# Copy dependency manifests
+COPY --chown=node:node pnpm-lock.yaml package.json ./
+
+# Install ALL dependencies (using cache)
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store,uid=1000,gid=1000 \
+    pnpm install --frozen-lockfile
+
+# Copy the rest of the workspace
+COPY --chown=node:node . .
+
+# Run the development server (which Docker Compose Watch will sync into)
+CMD ["pnpm", "dev"]

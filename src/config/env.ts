@@ -12,7 +12,7 @@ import dotenv from "dotenv";
 import { z } from "zod";
 
 // Load variables from .env file into process.env
-dotenv.config();
+dotenv.config({ debug: true });
 // Define the schema with types and default values
 const envSchema = z.object({
   NODE_ENV: z
@@ -20,8 +20,9 @@ const envSchema = z.object({
     .default("development"),
   PORT: z.coerce.number().default(5000),
   FRONTEND_URL: z.url(),
-  HOST: z.url().default("http://localhost:9000"),
-  REDIS_URL: z.string().default("redis://localhost:6379"),
+  HOST: z.url().default("http://wallet-api:9000"),
+  REDIS_URL: z.string().default("redis://shared-redis:6379"),
+  REDIS_HOST: z.string().default("shared-redis"),
   // DATABASE_URL: z
   //   .string()
   //   .url("DATABASE_URL must be a valid connection string"),

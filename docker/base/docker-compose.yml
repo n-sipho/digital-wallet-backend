@@ -1,6 +1,42 @@
 # Base infrastructure services shared across dev and prod
 name: wallet-backend
 services:
+  wallet-api:
+    build: ../../
+    command: pnpm run dev
+    ports:
+      - "${PORT}"
+    networks:
+      - wallet-backend
+    develop:
+      watch:
+        # Rebuild container image when dependencies change
+        - action: rebuild
+          path: package.json
+        - action: rebuild
+          path: pnpm-lock.yaml
+
+        # Sync source files instantly without stopping the container
+        - action: sync
+          path: ../../src
+          target: /home/backend/src
+          ignore:
+            - node_modules/
+
+        # Sync tsconfig changes
+        - action: sync
+          path: ../../tsconfig.json
+          target: /home/backend/tsconfig.json
+
+        # Sync .env changes
+        - action: sync
+          path: ../../.env
+          target: /home/backend/.env
+    depends_on:
+      shared-database:
+        condition: service_healthy
+      shared-redis:
+        condition: service_healthy
   shared-database:
     image: postgres:16-alpine # use latest official postgres version
     container_name: digital-wallet-postgres

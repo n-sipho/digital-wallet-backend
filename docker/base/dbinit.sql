@@ -24,7 +24,7 @@ CREATE TABLE wallets (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     wallet_address_url TEXT NOT NULL, -- e.g. "https://ilp.interledger-test.dev/ijubane"
-    asset_code VARCHAR(12) NOT NULL,  -- e.g. "USD", "ZAR"
+    asset_code VARCHAR(12) NOT NULL,  -- e.g. "ZAR"
     asset_scale SMALLINT NOT NULL DEFAULT 2,
     auth_server TEXT NOT NULL,        -- e.g. "https://rafiki-auth.interledger-test.dev"
     resource_server TEXT NOT NULL,    -- e.g. "https://ilp.interledger-test.dev"
@@ -64,7 +64,7 @@ CREATE TABLE accounts (
     --   'SYSTEM_POINTS_RESERVE' (Points pool from which rewards are minted)
     --   'SYSTEM_CASH_SETTLEMENT'(Operating bank liquidity)
     --   'MERCHANT_PAYOUT'       (Settlement for partners)
-    asset_code VARCHAR(12) NOT NULL, -- 'PTS', 'USD', 'EUR', 'ZAR'
+    asset_code VARCHAR(12) NOT NULL, -- 'PTS', 'ZAR'
     asset_scale SMALLINT NOT NULL DEFAULT 0, -- 0 for points (integer), 2 for fiat cents
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
@@ -99,7 +99,6 @@ CREATE INDEX idx_transfers_created ON ledger_transfers(created_at DESC);
 CREATE TABLE reward_events (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-    -- campaign_id UUID REFERENCES reward_campaigns(id),
     transfer_id UUID NOT NULL REFERENCES ledger_transfers(id), -- Every reward creates a ledger entry
     points BIGINT NOT NULL,
     event_type reward_events_type NOT NULL, -- 'EARNED', 'REDEEMED', 'EXPIRED', 'ADJUSTMENT'

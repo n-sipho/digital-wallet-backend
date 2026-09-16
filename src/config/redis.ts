@@ -2,16 +2,32 @@ import Redis from "ioredis";
 import { env } from "./env";
 import { logger } from "@/utils/logger";
 
-export const redisClient = new Redis(env.REDIS_URL, {
+export const redisClient = new Redis({
+  host: env.REDIS_HOST, // e.g., 'shared-redis'
+  port: Number(process.env.REDIS_PORT) || 6379,
+  password: process.env.REDIS_PASSWORD,
   maxRetriesPerRequest: 3,
   enableReadyCheck: true,
   lazyConnect: true, // Connect explicitly during startup
+
   retryStrategy(times) {
     const delay = Math.min(times * 100, 3000);
     logger.warn({ times, delay }, "[Redis] Reconnecting...");
     return delay;
   },
 });
+//   (env.REDIS_URL, {
+
+//   maxRetriesPerRequest: 3,
+//   enableReadyCheck: true,
+//   lazyConnect: true, // Connect explicitly during startup
+
+//   retryStrategy(times) {
+//     const delay = Math.min(times * 100, 3000);
+//     logger.warn({ times, delay }, "[Redis] Reconnecting...");
+//     return delay;
+//   },
+// });
 
 redisClient.on("connect", () => {
   logger.info("[Redis] someone connected!");

@@ -10,13 +10,13 @@ BEGIN;
 -- (These accounts represent internal reserve pools and settlement accounts)
 -- ------------------------------------------------------------------------------
 INSERT INTO accounts (id, user_id, type, asset_code, asset_scale, created_at)
-VALUES 
+VALUES
   -- System Points Pool (all reward points minted to users originate from here)
   ('00000000-0000-0000-0000-000000000001', NULL, 'SYSTEM_RESERVE', 'PTS', 0, NOW() - INTERVAL '30 days'),
-  -- System Fiat Clearing / Liquidity Reserve (USD)
-  ('00000000-0000-0000-0000-000000000002', NULL, 'SYSTEM_RESERVE', 'USD', 2, NOW() - INTERVAL '30 days'),
+  -- System Fiat Clearing / Liquidity Reserve (ZAR)
+  ('00000000-0000-0000-0000-000000000002', NULL, 'SYSTEM_RESERVE', 'ZAR', 2, NOW() - INTERVAL '30 days'),
   -- Partner Merchant Settlement Account
-  ('00000000-0000-0000-0000-000000000003', NULL, 'MERCHANT', 'USD', 2, NOW() - INTERVAL '30 days')
+  ('00000000-0000-0000-0000-000000000003', NULL, 'MERCHANT', 'ZAR', 2, NOW() - INTERVAL '30 days')
 ON CONFLICT (id) DO NOTHING;
 
 
@@ -72,12 +72,12 @@ VALUES
   -- Alice Points Balance Account (scale 0)
   ('11111111-aaaa-1111-aaaa-111111111111', 'a1111111-1111-1111-1111-111111111111', 'USER', 'PTS', 0, NOW() - INTERVAL '14 days'),
   -- Alice Cash / Fiat Balance Account (scale 2)
-  ('11111111-bbbb-1111-bbbb-111111111111', 'a1111111-1111-1111-1111-111111111111', 'USER', 'USD', 2, NOW() - INTERVAL '14 days'),
-  
+  ('11111111-bbbb-1111-bbbb-111111111111', 'a1111111-1111-1111-1111-111111111111', 'USER', 'ZAR', 2, NOW() - INTERVAL '14 days'),
+
   -- Bob Points Balance Account
   ('22222222-aaaa-2222-aaaa-222222222222', 'b2222222-2222-2222-2222-222222222222', 'USER', 'PTS', 0, NOW() - INTERVAL '7 days'),
   -- Bob Cash / Fiat Balance Account
-  ('22222222-bbbb-2222-bbbb-222222222222', 'b2222222-2222-2222-2222-222222222222', 'USER', 'USD', 2, NOW() - INTERVAL '7 days')
+  ('22222222-bbbb-2222-bbbb-222222222222', 'b2222222-2222-2222-2222-222222222222', 'USER', 'ZAR', 2, NOW() - INTERVAL '7 days')
 ON CONFLICT (id) DO NOTHING;
 
 
@@ -90,7 +90,7 @@ VALUES
     'd1111111-1111-1111-1111-111111111111',
     'a1111111-1111-1111-1111-111111111111',
     'https://ilp.interledger-test.dev/ijubane',
-    'USD',
+    'ZAR',
     2,
     'https://rafiki-auth.interledger-test.dev',
     'https://ilp.interledger-test.dev',
@@ -103,7 +103,7 @@ VALUES
     'd2222222-2222-2222-2222-222222222222',
     'b2222222-2222-2222-2222-222222222222',
     'https://ilp.interledger-test.dev/leli',
-    'USD',
+    'ZAR',
     2,
     'https://rafiki-auth.interledger-test.dev',
     'https://ilp.interledger-test.dev',
@@ -177,26 +177,26 @@ VALUES
     NOW() - INTERVAL '7 days'
   ),
 
-  -- 3. Alice deposits $100.00 USD into her wallet
+  -- 3. Alice deposits R100.00 ZAR into her wallet
   (
     'c3333333-3333-3333-3333-333333333333',
-    'idemp-deposit-alice-usd-003',
+    'idemp-deposit-alice-zar-003',
     '00000000-0000-0000-0000-000000000002', -- Debit System Liquidity Reserve
-    '11111111-bbbb-1111-bbbb-111111111111', -- Credit Alice USD Account
-    10000,                                 -- $100.00 USD (scale 2 = 10,000 cents)
+    '11111111-bbbb-1111-bbbb-111111111111', -- Credit Alice ZAR Account
+    10000,                                 -- R100.00 ZAR (scale 2 = 10,000 cents)
     'POSTED',
     'DEPOSIT',
     'Initial wallet deposit via Open Payments',
     NOW() - INTERVAL '5 days'
   ),
 
-  -- 4. Alice pays $15.50 USD to Merchant Store
+  -- 4. Alice pays R15.50 ZAR to Merchant Store
   (
     'c4444444-4444-4444-4444-444444444444',
     'idemp-purchase-alice-merchant-004',
-    '11111111-bbbb-1111-bbbb-111111111111', -- Debit Alice USD Account
-    '00000000-0000-0000-0000-000000000003', -- Credit Merchant USD Account
-    1550,                                  -- $15.50 USD (1,550 cents)
+    '11111111-bbbb-1111-bbbb-111111111111', -- Debit Alice ZAR Account
+    '00000000-0000-0000-0000-000000000003', -- Credit Merchant ZAR Account
+    1550,                                  -- R15.50 ZAR (1,550 cents)
     'POSTED',
     'CARD_PAYOUT',
     'Purchase at Cloud Nine Coffee',
@@ -221,12 +221,12 @@ ON CONFLICT (id) DO NOTHING;
 -- ------------------------------------------------------------------------------
 -- 7. REWARD EVENTS (Auditable activity log linked to transfers)
 -- ------------------------------------------------------------------------------
-INSERT INTO reward_events (id, user_id, campaign_id, transfer_id, points, event_type, metadata, created_at)
+INSERT INTO reward_events (id, user_id, transfer_id, points, event_type, metadata, created_at)
 VALUES
   (
     'e1111111-1111-1111-1111-111111111111',
     'a1111111-1111-1111-1111-111111111111',
-    NULL,
+
     'c1111111-1111-1111-1111-111111111111',
     500,
     'EARNED',
@@ -236,7 +236,7 @@ VALUES
   (
     'e2222222-2222-2222-2222-222222222222',
     'b2222222-2222-2222-2222-222222222222',
-    NULL,
+
     'c2222222-2222-2222-2222-222222222222',
     250,
     'EARNED',
@@ -246,11 +246,11 @@ VALUES
   (
     'e3333333-3333-3333-3333-333333333333',
     'a1111111-1111-1111-1111-111111111111',
-    NULL,
+
     'c5555555-5555-5555-5555-555555555555',
     30,
     'EARNED',
-    '{"reason": "merchant_cashback", "merchant": "Cloud Nine Coffee", "order_amount_usd": 15.50}'::jsonb,
+    '{"reason": "merchant_cashback", "merchant": "Cloud Nine Coffee", "order_amount_zar": 15.50}'::jsonb,
     NOW() - INTERVAL '2 days'
   )
 ON CONFLICT (id) DO NOTHING;
