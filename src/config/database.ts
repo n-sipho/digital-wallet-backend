@@ -8,12 +8,15 @@
  * 3. Export connection and disconnection helper functions (e.g. `connectDB()` and `disconnectDB()`).
  * 4. Implement retry strategies and exponential backoff for transient connection errors during startup.
  */
-import { Grant, PendingGrant } from "@interledger/open-payments";
-// interface PendingGrant {
-//   accessToken: string;
-//   url: string;
-// }
+import knex from "knex";
+import { PendingGrant } from "@interledger/open-payments";
+import knexConfig from "../../knexfile";
+
 export const memoryDb = {
   pendingGrants: new Map<string, PendingGrant>(),
   finalTokens: new Map<string, string>(),
 };
+
+const db = knex(knexConfig);
+
+export default db;

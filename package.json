@@ -17,11 +17,13 @@
     "api:logs": "pnpm localenv:compose logs -f wallet-api"
   },
   "dependencies": {
+    "@apollo/client": "^4.3.0",
     "@interledger/open-payments": "^7.4.0",
     "@ngrok/ngrok": "^1.7.0",
     "cors": "^2.8.6",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
+    "graphql": "^17.0.2",
     "helmet": "^8.3.0",
     "install": "^0.13.0",
     "ioredis": "^6.0.0",
@@ -30,6 +32,7 @@
     "pg": "^8.23.0",
     "pino": "^10.3.1",
     "pino-http": "^11.0.0",
+    "yaml": "^2.9.1",
     "zod": "^4.5.4"
   },
   "devDependencies": {

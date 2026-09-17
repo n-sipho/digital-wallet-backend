@@ -23,9 +23,7 @@ const envSchema = z.object({
   HOST: z.url().default("http://wallet-api:9000"),
   REDIS_URL: z.string().default("redis://shared-redis:6379"),
   REDIS_HOST: z.string().default("shared-redis"),
-  // DATABASE_URL: z
-  //   .string()
-  //   .url("DATABASE_URL must be a valid connection string"),
+  DATABASE_URL: z.url("DATABASE_URL must be a valid connection string"),
   // JWT_SECRET: z
   //   .string()
   //   .min(16, "JWT_SECRET must be at least 16 characters long"),
