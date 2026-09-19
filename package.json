@@ -12,9 +12,13 @@
     "dev": "tsx watch src/server.ts",
     "test": "jest",
     "tunnel:start": "tsx local-tunnel-setup.ts",
-    "localenv:compose": "docker compose -f docker/base/docker-compose.yml --env-file ./.env",
+    "localenv:compose": "docker compose -f docker/base/docker-compose.yml --env-file ./.env -f docker/dev/docker-compose.yml --env-file ./.env",
     "localenv:clean": "pnpm localenv:compose down --volumes --rmi all",
-    "api:logs": "pnpm localenv:compose logs -f wallet-api"
+    "api:logs": "pnpm localenv:compose logs -f wallet-api",
+    "knex": "tsx ./node_modules/knex/bin/cli.js",
+    "db:migrate": "knex migrate:latest",
+    "db:rollback": "knex migrate:rollback",
+    "db:seed": "tsx scripts/seed.ts"
   },
   "dependencies": {
     "@apollo/client": "^4.3.0",
@@ -36,8 +40,10 @@
     "zod": "^4.5.4"
   },
   "devDependencies": {
+    "@faker-js/faker": "^10.6.0",
     "@swc/core": "^1.16.2",
     "@swc/jest": "^0.2.39",
+    "@testcontainers/postgresql": "^12.1.0",
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.6",
     "@types/helmet": "^4.0.0",
@@ -48,7 +54,9 @@
     "jest": "^30.5.1",
     "pino-pretty": "^13.1.3",
     "supertest": "^7.2.2",
+    "testcontainers": "^12.1.0",
     "ts-jest": "^29.4.12",
+    "ts-node": "^10.9.2",
     "tsx": "^4.23.13",
     "typescript": "^7.0.2",
     "uuid": "^14.0.2"

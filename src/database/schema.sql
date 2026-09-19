@@ -6,13 +6,12 @@ CREATE TYPE reward_events_type AS ENUM ('EARNED', 'REDEEMED', 'EXPIRED', 'ADJUST
 
 CREATE TABLE users (
         id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        first_name VARCHAR(100),
+        last_name VARCHAR(100),
         email VARCHAR(255) UNIQUE NOT NULL,
         phone_number VARCHAR(32) UNIQUE,
         password_hash VARCHAR(255), -- Nullable if using OAuth/Magic Link
-        first_name VARCHAR(100),
-        last_name VARCHAR(100),
         status user_status NOT NULL DEFAULT 'ACTIVE', -- 'ACTIVE', 'SUSPENDED', 'PENDING_VERIFICATION'
-        kyc_level SMALLINT NOT NULL DEFAULT 0,
         created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
         updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
     );

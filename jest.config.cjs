@@ -19,5 +19,8 @@ module.exports = {
     "^@/(.*)$": "<rootDir>/src/$1",
     "^(\\.{1,2}/.*)\\.js$": "$1",
   },
-  testMatch: ["**/tests/**/*.test.ts"],
+  testMatch: [
+    "**/*.test.ts",
+    "**/*.spec.ts",
+  ],
 };

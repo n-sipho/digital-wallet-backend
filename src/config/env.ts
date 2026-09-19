@@ -31,6 +31,13 @@ const envSchema = z.object({
   JWT_EXPIRES_IN: z.string().default("1d"),
   CORS_ORIGIN: z.string(),
   LOG_LEVEL: z.enum(["debug", "info", "warn", "error"]).default("info"),
+  MOCK_USERS_COUNT: z.string(),
+  SEED_USERS: z.coerce.number().int().positive(),
+  TEST_DB_NAME: z.string(),
+  DB_USER: z.string(),
+  DB_PASSWORD: z.string(),
+  DB_TEST_PORT: z.coerce.number().default(5433),
+  DB_HOST: z.string()
 });
 
 // Validate process.env against schema

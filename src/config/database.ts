@@ -11,12 +11,16 @@
 import knex from "knex";
 import { PendingGrant } from "@interledger/open-payments";
 import knexConfig from "../../knexfile";
+import { env } from "./env";
 
 export const memoryDb = {
   pendingGrants: new Map<string, PendingGrant>(),
   finalTokens: new Map<string, string>(),
 };
 
-const db = knex(knexConfig);
+const environment = env.NODE_ENV || 'development';
+const config = knexConfig[environment];
+
+const db = knex(config);
 
 export default db;

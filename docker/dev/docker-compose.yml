@@ -1,0 +1,29 @@
+services:
+  db-seed:
+    build:
+      context: ../..
+      dockerfile: ./Dockerfile.dev
+    # environment:
+
+    depends_on:
+      shared-database:
+        condition: service_healthy
+    command: pnpm db:seed
+    networks:
+      - wallet-backend
+  backend-test:
+    build:
+      context: ../..
+      dockerfile: ./Dockerfile.dev
+    environment:
+      NODE_ENV: ${NODE_ENV:-test}
+      DB_HOST: ${DB_HOST:-shared-database}
+      DB_PORT: ${DB_PORT:-5432}
+      DB_USER: ${POSTGRES_USER}
+      DB_PASSWORD: ${POSTGRES_PASSWORD}
+      DB_NAME: ${TEST_DB_NAME}
+    depends_on:
+      shared-database:
+        condition: service_healthy
+    networks:
+      - wallet-backend

@@ -2,7 +2,9 @@
 name: wallet-backend
 services:
   wallet-api:
-    build: ../../
+    build: 
+      context: ../..
+      dockerfile: ./Dockerfile.dev
     command: pnpm run dev
     ports:
       - "${PORT}"
@@ -39,29 +41,29 @@ services:
         condition: service_healthy
   shared-database:
     image: postgres:16-alpine # use latest official postgres version
-    container_name: digital-wallet-postgres
+    container_name: shared-database
     restart: unless-stopped
     networks:
       - wallet-backend
     volumes:
       - pgdata:/var/lib/postgresql/data # persist data even if container shuts down
-      - ./dbinit.sql:/docker-entrypoint-initdb.d/01-dbinit.sql
-      - ./seed.sql:/docker-entrypoint-initdb.d/02-seed.sql # ← Auto-runs on first boot
+      - ../../src/database/schema.sql/docker-entrypoint-initdb.d/01-init.sql
+      # - ./seed.sql:/docker-entrypoint-initdb.d/02-seed.sql # ← Auto-runs on first boot
     ports:
       - "${DB_PORT:-5432}:5432"
     environment:
-      POSTGRES_DB: ${POSTGRES_DB:-wallet_backend}
-      POSTGRES_USER: ${POSTGRES_USER:-wallet_backend}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-wallet_backend}
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U wallet_backend -d wallet_backend"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
       interval: 10s
       timeout: 5s
       retries: 5
       start_period: 30s
   shared-redis:
     image: "redis:8"
-    container_name: digital-wallet-redis
+    container_name: shared-redis
     restart: unless-stopped
     # Enables data persistence (saves DB every 60s if >=1 key changed) and sets a password
     command: redis-server --save 60 1 --loglevel notice --requirepass ${REDIS_PASSWORD:-secretpassword}

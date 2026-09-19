@@ -1,12 +1,24 @@
+import { env } from "@/config/env";
 import type { Knex } from "knex";
-import { env } from "./src/config/env";
+// import { env } from "./src/config/env";
 
 // Update with your config settings.
 
 const knexConfig: { [key: string]: Knex.Config } = {
   development: {
-    client: "pg",
-    connection: env.DATABASE_URL
+    client: "postgresql",
+    connection: process.env.DATABASE_URL,
+  },
+
+  test: {
+    client: "postgresql",
+    connection: {
+      host: env.DB_HOST,
+      port: env.DB_TEST_PORT,
+      user: env.DB_USER,
+      password: env.DB_PASSWORD,
+      database: env.TEST_DB_NAME,
+    },
   },
 
   staging: {
