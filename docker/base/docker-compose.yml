@@ -47,7 +47,7 @@ services:
       - wallet-backend
     volumes:
       - pgdata:/var/lib/postgresql/data # persist data even if container shuts down
-      - ../../src/database/schema.sql/docker-entrypoint-initdb.d/01-init.sql
+      - ../../src/database/schema.sql:/docker-entrypoint-initdb.d/01-init.sql
       # - ./seed.sql:/docker-entrypoint-initdb.d/02-seed.sql # ← Auto-runs on first boot
     ports:
       - "${DB_PORT:-5432}:5432"

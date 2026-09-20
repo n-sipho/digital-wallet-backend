@@ -1,8 +1,10 @@
+import { describe, expect, jest, it, beforeAll, afterAll } from "@jest/globals";
 import { PostgreSqlContainer } from "@testcontainers/postgresql";
 import { createUserRepository } from "./user.repository";
 import knex, { Knex } from "knex";
 import fs from "node:fs/promises";
 import path from "node:path";
+import { createUser as createTestUser } from "@/database/seeds/factories/user.factory";
 
 describe("User Repository", () => {
   jest.setTimeout(60000);
@@ -12,18 +14,11 @@ describe("User Repository", () => {
 
   beforeAll(async () => {
     const container = await new PostgreSqlContainer("postgres:13.3-alpine").start();
-
     postgresContainer = container;
 
     knexClient = knex({
       client: "postgresql",
-      connection: {
-        host: container.getHost(),
-        port: postgresContainer.getPort(),
-        user: postgresContainer.getUsername(),
-        password: postgresContainer.getPassword(),
-        database: postgresContainer.getDatabase(),
-      }
+      connection: container.getConnectionUri(),
     })
 
     const schemaPath = path.resolve(
@@ -43,28 +38,40 @@ describe("User Repository", () => {
   });
 
 
-  it("should create and return the new user", async () => {
+  it("should create and return a new user", async () => {
     const userRepository = await createUserRepository(knexClient)
-    const newUser = {
-      id: "53dcdfbe-7b1c-4668-a398-2d72ffff19bd",
-      email: 'Kira.Zemlak@xyz.com',
-      phone_number: '9647169685',
-      password_hash: 'development-password-hash',
-      first_name: 'Kira',
-      last_name: 'Zemlak',
-      status: 'ACTIVE',
-    }
+    const testUser = createTestUser();
 
-    await userRepository.save(newUser);
-    const dbUser = await userRepository.findById(newUser.id);
+
+    const dbUser = await userRepository.save(testUser);
     expect(dbUser).toMatchObject({
-      id: newUser.id,
-      email: newUser.email,
-      phone_number: newUser.phone_number,
-      password_hash: newUser.password_hash,
-      first_name: newUser.first_name,
-      last_name: newUser.last_name,
-      status: newUser.status,
+      email: testUser.email,
+      phone_number: testUser.phone_number,
+      password_hash: testUser.password_hash,
+      first_name: testUser.first_name,
+      last_name: testUser.last_name,
     });
   });
+
+  it("should find user by email", async () => {
+    const userRepository = await createUserRepository(knexClient)
+    const testUser = createTestUser();
+
+    await userRepository.save(testUser);
+    const dbUser = await userRepository.findByEmail(testUser.email);
+
+    expect(dbUser.email).toEqual(testUser.email);
+  });
+
+  it("should find user by id", async () => {
+    const userRepository = await createUserRepository(knexClient)
+    const testUser = createTestUser();
+    const userId = testUser.id as string;
+
+    await userRepository.save(testUser);
+    const dbUser = await userRepository.findById(userId);
+
+    expect(dbUser.email).toEqual(testUser.email);
+  });
+
 });

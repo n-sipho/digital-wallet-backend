@@ -1,20 +1,22 @@
+import { User } from "@/types/user";
 import { faker } from "@faker-js/faker";
-import type { Knex } from "knex";
+import { v4 as uuidv4 } from "uuid";
 
-export async function createUser(db: Knex) {
+export const createUser = (): User => {
   const firstName = faker.person.firstName();
   const lastName = faker.person.lastName();
 
-  const [user] = await db("users")
-    .insert({
-      first_name: firstName,
-      last_name: lastName,
-      email: faker.internet.email({ firstName, lastName, provider: "xyz.com" }),
-      phone_number: faker.phone.number({ style: "mobile" }),
-      password_hash: "development-password-hash",
-    })
-    .returning("*");
+  const user = {
+    id: uuidv4(),
+    first_name: firstName,
+    last_name: lastName,
+    email: faker.internet.email({ firstName, lastName, provider: "xyz.com" }),
+    phone_number: faker.phone.number({ style: "mobile" }),
+    password_hash: "development-password-hash",
+  }
+
 
   return user;
 }
+
 

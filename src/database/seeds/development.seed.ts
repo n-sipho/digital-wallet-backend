@@ -12,11 +12,12 @@ export async function seedDevelopment() {
     logger.info("Users already exist. Skipping seed.");
     return;
   }
-  
+
   await db.transaction(async (trx) => {
     for (let i = 0; i < userCount; i++) {
-      const user = await createUser(trx);
-      logger.info("seeded user:", user);
+      const user = createUser();
+      await trx("users").insert(user);
+      logger.info(`seeded user: ${user.first_name} ${user.last_name}`);
     }
   });
 }
