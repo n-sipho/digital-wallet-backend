@@ -31,4 +31,12 @@ module.exports = {
     "**/*.test.ts",
     "**/*.spec.ts",
   ],
+
+  collectCoverage: true,
+
+  coverageReporters: [
+    "text",
+    "lcov",
+    "json-summary"
+  ],
 };
