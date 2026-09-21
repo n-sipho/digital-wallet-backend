@@ -12,5 +12,5 @@ export interface User {
 
 export interface UserAuthToken {
     id: string;
-    role: string;
+    email: string;
 }   
