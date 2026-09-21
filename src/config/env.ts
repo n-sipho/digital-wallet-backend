@@ -37,7 +37,8 @@ const envSchema = z.object({
   DB_USER: z.string(),
   DB_PASSWORD: z.string(),
   DB_TEST_PORT: z.coerce.number().default(5433),
-  DB_HOST: z.string()
+  DB_HOST: z.string(),
+  JWT_SECRET: z.string()
 });
 
 // Validate process.env against schema

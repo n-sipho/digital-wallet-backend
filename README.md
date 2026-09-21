@@ -1,7 +1,6 @@
 # Digital Wallet Backend
 
-[![Backend CI](https://github.com/n-sipho/digital-wallet-backend/actions/workflows/backend.yml/badge.svg)](https://github.com/n-sipho/digital-wallet-backend/actions/workflows/backend.yml)
-
+[![Backend CI](https://github.com/n-sipho/digital-wallet-backend/actions/workflows/backend.yml/badge.svg)](https://github.com/n-sipho/digital-wallet-backend/actions/workflows/backend.yml) [![Coverage Status](https://coveralls.io/repos/github/n-sipho/digital-wallet-backend/badge.svg?branch=main)](https://coveralls.io/github/n-sipho/digital-wallet-backend?branch=main)
 <!--
 ==============================================================================
 README.md Documentation

@@ -20,9 +20,13 @@ import { router } from "./routes/index";
 import { errorMiddleware } from "./middlewares/error.middleware";
 import { AppError } from "./utils/appError";
 import { httpLogger } from "./middlewares/logger.middleware";
+import { createUserRepository } from "./repositories/user.repository";
+import knexClient from "./config/database";
 
 export const app: Application = express();
- app.use(httpLogger);
+
+
+app.use(httpLogger);
 // Middlewares
 // app.use(helmet());
 app.use(cors());

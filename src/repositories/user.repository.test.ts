@@ -1,10 +1,10 @@
 import { describe, expect, jest, it, beforeAll, afterAll } from "@jest/globals";
 import { PostgreSqlContainer } from "@testcontainers/postgresql";
-import { createUserRepository } from "./user.repository";
 import knex, { Knex } from "knex";
 import fs from "node:fs/promises";
 import path from "node:path";
 import { createUser as createTestUser } from "@/database/seeds/factories/user.factory";
+import { userRepository } from ".";
 
 describe("User Repository", () => {
   jest.setTimeout(60000);
@@ -39,7 +39,6 @@ describe("User Repository", () => {
 
 
   it("should create and return a new user", async () => {
-    const userRepository = await createUserRepository(knexClient)
     const testUser = createTestUser();
 
 
@@ -54,7 +53,6 @@ describe("User Repository", () => {
   });
 
   it("should find user by email", async () => {
-    const userRepository = await createUserRepository(knexClient)
     const testUser = createTestUser();
 
     await userRepository.save(testUser);
@@ -64,7 +62,6 @@ describe("User Repository", () => {
   });
 
   it("should find user by id", async () => {
-    const userRepository = await createUserRepository(knexClient)
     const testUser = createTestUser();
     const userId = testUser.id as string;
 

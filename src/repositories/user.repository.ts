@@ -1,7 +1,7 @@
 import { User } from "@/types/user";
 import { Knex } from "knex";
 
-export const createUserRepository = async (db: Knex) => {
+export const createUserRepository = (db: Knex) => {
   return {
     save: async (user: User): Promise<User> => {
       const [savedUser] = await db("users").insert(user).returning("*");

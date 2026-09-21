@@ -9,4 +9,7 @@
  * 4. Handle database-level transactions across multiple repository calls at this layer or via a unit-of-work helper.
  */
 
-export {};
+import knexClient from "@/config/database";
+import { createUserRepository } from "./user.repository";
+
+export const userRepository = createUserRepository(knexClient);

@@ -21,6 +21,6 @@ export const memoryDb = {
 const environment = env.NODE_ENV || 'development';
 const config = knexConfig[environment];
 
-const db = knex(config);
+const knexClient = knex(config);
 
-export default db;
+export default knexClient;
