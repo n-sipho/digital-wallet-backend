@@ -4,13 +4,15 @@ import knex, { Knex } from "knex";
 import fs from "node:fs/promises";
 import path from "node:path";
 import { createUser as createTestUser } from "@/database/seeds/factories/user.factory";
-import { userRepository } from ".";
+import { createUserRepository } from "./user.repository";
+// import { userRepository } from ".";
 
 describe("User Repository", () => {
   jest.setTimeout(60000);
 
   let postgresContainer: Awaited<ReturnType<PostgreSqlContainer["start"]>>;
   let knexClient: Knex;
+  let userRepository: ReturnType<typeof createUserRepository>;
 
   beforeAll(async () => {
     const container = await new PostgreSqlContainer("postgres:13.3-alpine").start();
@@ -20,6 +22,8 @@ describe("User Repository", () => {
       client: "postgresql",
       connection: container.getConnectionUri(),
     })
+
+    userRepository = createUserRepository(knexClient);
 
     const schemaPath = path.resolve(
       process.cwd(),
