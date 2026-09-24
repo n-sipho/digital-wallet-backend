@@ -7,33 +7,38 @@ services:
       dockerfile: ./Dockerfile.dev
     command: pnpm run dev
     ports:
-      - "${PORT}"
+      - "9001:${PORT:-9000}"
     networks:
       - wallet-backend
     develop:
       watch:
         # Rebuild container image when dependencies change
         - action: rebuild
-          path: package.json
+          path: ../../package.json
         - action: rebuild
-          path: pnpm-lock.yaml
+          path: ../../pnpm-lock.yaml
+        - action: rebuild
+          path: ../../Dockerfile.dev
 
-        # Sync source files instantly without stopping the container
-        - action: sync
+        # Restart explicitly so synced changes always reach the running API.
+        - action: sync+restart
           path: ../../src
           target: /home/backend/src
+          initial_sync: true
           ignore:
             - node_modules/
 
         # Sync tsconfig changes
-        - action: sync
+        - action: sync+restart
           path: ../../tsconfig.json
           target: /home/backend/tsconfig.json
+          initial_sync: true
 
         # Sync .env changes
-        - action: sync
+        - action: sync+restart
           path: ../../.env
           target: /home/backend/.env
+          initial_sync: true
     depends_on:
       shared-database:
         condition: service_healthy

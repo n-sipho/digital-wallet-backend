@@ -3,8 +3,12 @@ import { urlRouter } from "./url.routes";
 import { walletRouter } from "./wallet.routes";
 import { onboardingRouter } from "./onboarding.routes";
 import { redisRouter } from "./redis.routes";
+import { authRouter } from "./auth/auth.routes";
 
 const router = Router();
+
+// Auth routes
+router.use("/auth", authRouter);
 
 // Mount domain routes
 // All routes in urlRouter will be prefixed with /urls (e.g. /api/v1/urls/shorten)

@@ -1,24 +1,64 @@
 import { userRepository } from "@/repositories";
-import { RegisterInput } from "@/types/auth";
+import type { LoginInput, LoginResult, RegisterInput, RegisterResult } from "@/types/auth";
 import { AppError } from "@/utils/appError";
-import bcrypt from "bcrypt";
+import { createAccessToken } from "@/utils/auth/auth-token";
+import { hashPassword, verifyPassword } from "@/utils/auth/password";
 
 export class AuthService {
 
-    register = async (user: RegisterInput) => {
+    register = async (user: RegisterInput): Promise<RegisterResult> => {
         const existing = await userRepository.findByEmail(user.email);
         if (existing) {
             throw new AppError("A user with this email already exists.", 400);
         }
 
-        const salt = await bcrypt.genSalt(10);
-        const hashedPassword = await bcrypt.hash(user.password, salt);
+        const hashedPassword = await hashPassword(user.password);
 
         const savedUser = await userRepository.save({
-            ...user,
-            password_hash: hashedPassword
+            first_name: user.first_name,
+            last_name: user.last_name,
+            email: user.email,
+            password_hash: hashedPassword,
+            phone_number: user.phone_number
         });
 
-        return savedUser;
+        const userId = savedUser.id as string;
+        const userEmail = savedUser.email as string;
+        const token = createAccessToken({
+            id: userId,
+            email: userEmail
+        });
+
+        const { password_hash, ...publicUser } = savedUser;
+        return {
+            publicUser,
+            token
+        };
+    }
+
+    login = async (userLogin: LoginInput): Promise<LoginResult> => {
+        const user = await userRepository.findByEmail(userLogin.email)
+        if (!user) {
+            throw new AppError("User account not found", 404);
+        }
+
+        const password = userLogin.password;
+        const hash = user.password_hash as string;
+        const hasAccess = await verifyPassword(password, hash);
+        if (!hasAccess) {
+            throw new AppError(`Incorrect email or password`, 401);
+        }
+
+        const userId = user.id as string;
+        const userEmail = user.email as string;
+        const token = createAccessToken({
+            id: userId,
+            email: userEmail
+        });
+
+        return token;
+
     }
 }
+
+export const authService = new AuthService();
